@@ -1,10 +1,7 @@
 # One file that can be scss, js, coffee, ts, etc...
 class LuxAssets::Element
-  TMP_ASSETS = './tmp/assets'
-
-  def initialize source, opts={}
+  def initialize source
     @source = Pathname.new source
-    @opts   = opts
     @cache = Pathname.new './tmp/assets/%s' % source.gsub('/','-')
   end
 
@@ -29,6 +26,7 @@ class LuxAssets::Element
   private
 
   def production?
+    # if building from Rake then we are compiling for production
     defined?(Rake)
   end
 
