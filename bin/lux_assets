@@ -44,13 +44,15 @@ class AssetsCli < Thor
 
     puts '* Installed: %s' % packages.map(&:green).join(', ')
 
-    unless LuxAssets::CONFIG_PATH.exist?
-      source = Pathname.new(__FILE__).join("../../misc/assets.rb")
-      LuxAssets::CONFIG_PATH.write source.read
-      puts '* Added template %s' % LuxAssets::CONFIG_PATH.to_s.green
-    end
+    if ENV['RACK_ENV'] != 'test'
+      unless LuxAssets::CONFIG_PATH.exist?
+        source = Pathname.new(__FILE__).join("../../misc/assets.rb")
+        LuxAssets::CONFIG_PATH.write source.read
+        puts '* Added template %s' % LuxAssets::CONFIG_PATH.to_s.green
+      end
 
-    puts "* To include LuxAssets rake tasks in Rakefile, just require 'lux_assets'".green
+      puts "* To include LuxAssets rake tasks in Rakefile, just require 'lux_assets'".green
+    end
   end
 
   desc :show, 'Show all files/data in manifest'
