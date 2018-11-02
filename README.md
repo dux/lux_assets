@@ -1,4 +1,4 @@
-# Web assets
+# Lux web assets
 
 Lightweight web assets packer that loves simplicity.
 

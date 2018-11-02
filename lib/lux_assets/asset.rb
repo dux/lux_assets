@@ -27,7 +27,7 @@ class LuxAssets::Asset
       if file.is_a?(Proc)
         @data.push file.call
       else
-        @data.push LuxAssets::Element.new(file, production: true).compile
+        @data.push LuxAssets::Element.new(file).compile
       end
     end
 
@@ -60,8 +60,8 @@ class LuxAssets::Asset
 
   def compile_js
     save_data @data.join(";\n") do
-      # minify
-      LuxAssets.run './node_modules/minifier/index.js --no-comments -o "%{file}" "%{file}"' % { file: @asset_path }
+      # babel fix and minify
+      LuxAssets.run 'node_modules/babel-cli/.bin/babel --minified --no-comments --compact true -o "%{file}" "%{file}"' % { file: @asset_path }
     end
   end
 

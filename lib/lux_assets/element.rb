@@ -27,7 +27,7 @@ class LuxAssets::Element
 
   def production?
     # if building from Rake then we are compiling for production
-    defined?(Rake)
+    ENV['LUX_ASSETS_ENV'] == 'production' || defined?(Rake)
   end
 
   def cached
