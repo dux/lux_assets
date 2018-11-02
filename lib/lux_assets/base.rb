@@ -125,13 +125,23 @@ module LuxAssets
   end
 
   def compile_all
+    # generate master file for every resource
     for ext in [:js, :css]
       for name in to_h[ext].keys
         path = LuxAssets.send(ext, name).compile
-
         yield "#{ext}/#{name}", path if block_given?
       end
     end
+
+    # gzip if needed
+    files = Dir['./public/assets/*.css'] + Dir['./public/assets/*.js']
+    files.each do |file|
+      LuxAssets.run 'gzip -k %s' % file unless File.exist?('%s.gz' % file)
+    end
+
+    # touch all files reset timestamp
+    Dir['./public/assets/*']
+      .each { |file| system 'touch -t 201001010101 %s' % file }
   end
 
   def to_h
@@ -142,6 +152,24 @@ module LuxAssets
     end
 
     @assets
+  end
+
+  # show files and file sizes
+  def examine
+    data = to_h.dup
+    data.each do |ext, value_hash|
+      puts ext.to_s.upcase.green
+      value_hash.each do |key, files|
+        puts '  %s' % key.green
+        files.each_with_index do |file, i|
+          if File.exist?(file)
+            puts '  %s kb - %s' % [(File.size(file)/1024.to_f).round(1).to_s.rjust(6), file]
+          else
+            puts '  %s' % file
+          end
+        end
+      end
+    end
   end
 
   private

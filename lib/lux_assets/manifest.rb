@@ -8,13 +8,12 @@ module LuxAssets::Manifest
   def add name, path
     json = JSON.load MANIFEST.read
 
-    return false if json['files'][name] == path
+    unless json['files'][name] == path
+      json['files'][name] = path
+      MANIFEST.write JSON.pretty_generate(json)
+    end
 
-    json['files'][name] = path
-
-    MANIFEST.write JSON.pretty_generate(json)
-
-    true
+    !File.exist?('./public'+path)
   end
 
   def get name

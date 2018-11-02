@@ -25,7 +25,7 @@ namespace :assets do
 
   desc 'Show all files/data in manifest'
   task show: :env do
-    ap LuxAssets.to_h
+    LuxAssets.examine
   end
 
   desc 'Upload assets to S3'

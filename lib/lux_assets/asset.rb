@@ -48,13 +48,9 @@ class LuxAssets::Asset
     @asset_file = '/assets/%s' % (@target.sub('/', '-') + '-' + Digest::SHA1.hexdigest(data) + '.' + @ext.to_s)
     @asset_path = "./public#{@asset_file}"
 
-    File.write(@asset_path, data)
-
     if LuxAssets::Manifest.add(@target, @asset_file)
+      File.write(@asset_path, data)
       yield
-
-      LuxAssets.run 'touch -t 201001010101 %s' % @asset_path
-      LuxAssets.run 'gzip -k %s' % @asset_path
     end
   end
 

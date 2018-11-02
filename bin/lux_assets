@@ -55,7 +55,7 @@ class AssetsCli < Thor
 
   desc :show, 'Show all files/data in manifest'
   def show
-    ap LuxAssets.to_h
+    LuxAssets.examine
   end
 
   desc :compile, 'Compile assets for production'
