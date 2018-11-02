@@ -32,7 +32,7 @@ Commands:
 ```
 
 1. Start with `lux_assets install`
-2. Modify ./config/assets.rb
+2. Modify `./config/assets.rb`
 3. Compile with `lux_assets compile`
 4. Inspect added files with `lux_assets show`
 
@@ -109,9 +109,13 @@ If you add proc, proc retun must be a string, not a file
 This is all that is needed to add support for TypeScript compilation.
 
 ```
+yarn add typescript
+```
+
+```
 class LuxAssets::Element
   def compile_ts
-    LuxAssets.run "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'"
+    system "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'"
   end
 end
 ```
