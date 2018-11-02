@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+
+require 'thor'
+require 'colorize'
+require 'awesome_print'
+
+require_relative '../lib/lux_assets'
+
+###
+
+module Cli
+  extend self
+
+  def run what
+    puts what.green
+    system what
+  end
+
+  def die text
+    puts text.red
+    exit
+  end
+
+  def info text
+    puts '* %s' % text.magenta
+  end
+end
+
+###
+
+class AssetsCli < Thor
+
+  desc :install, 'Install all needed packages via yarn'
+  def install
+    packages  = ["coffee-script", "minifier", "node-sass", "typescript", "babel-cli", "autoprefixer-cli"]
+
+    if `which yarn`.empty?
+      Cli.die('yarn not found -> install with "npm install yarn -g"')
+    end
+
+    for pkg in packages
+      Cli.run 'yarn add %s' % pkg
+    end
+
+    puts '* Installed: %s' % packages.map(&:green).join(', ')
+
+    unless LuxAssets::CONFIG_PATH.exist?
+      source = Pathname.new(__FILE__).join("../../misc/assets.rb")
+      LuxAssets::CONFIG_PATH.write source.read
+      puts '* Added template %s' % LuxAssets::CONFIG_PATH.to_s.green
+    end
+
+    puts "* To include LuxAssets rake tasks in Rakefile, just require 'lux_assets'".green
+  end
+
+  desc :show, 'Show all files/data in manifest'
+  def show
+    ap LuxAssets.to_h
+  end
+
+  desc :compile, 'Compile assets for production'
+  def compile
+    LuxAssets.compile_all do |name, path|
+      puts "Compile #{name.green} -> #{path}"
+    end
+  end
+
+  desc :clear, 'Clear all caches'
+  def clear
+    Cli.run 'rm -rf ./tmp/assets'
+    Cli.run 'rm -rf ./public/assets'
+    Cli.run 'rm ./public/manifest.json'
+  end
+
+end
+
+AssetsCli.start ARGV
