@@ -142,3 +142,19 @@ In `Rakefile` just add `require 'lux_assets'` and tasks will automaticly be adde
 
 Rake taks will call :env task to set up environment.
 
+```
+# Rakefile
+
+require 'lux_assets'
+
+task :env do
+  # require './config/application'
+end
+
+task :default do
+  puts 'rake -T to get all tasks'
+end
+```
+
+To test, `rake -T`
+
