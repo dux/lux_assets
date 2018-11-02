@@ -13,7 +13,7 @@ Lightweight web assets packer that loves simplicity.
 ## Instalation
 
 Add `lux_assets` gem to `Gemfile` and then `bundle install`
-```
+```ruby
 gem 'lux_assets'
 ```
 
@@ -62,7 +62,7 @@ ap LuxAssets.to_h
 
 ## Example ./config/assets.rb
 
-```
+```ruby
 # relative_root './app/assets'
 
 asset :admin do
@@ -101,6 +101,52 @@ end
 
 If you add proc, proc retun must be a string, not a file
 
+## API usage - all you need to know
+
+### In your code
+
+```ruby
+require 'lux_assets'
+
+# Get list of files defined in config
+LuxAssets.to_s[:js]
+LuxAssets.files(:js, :main)
+LuxAssets.files('js/main')
+LuxAssets.js(:main).files
+
+# compile single asset
+LuxAssets.compile('js/main/index.coffee')
+LuxAssets.compile('css/main/index.scss')
+
+# compile file group
+LuxAssets.js(:main).compile
+LuxAssets.css(:main).compile
+
+# compile all assets
+LuxAssets.compile_all do |name, path|
+  puts "Compile #{name.green} -> #{path}"
+end
+```
+
+### In config/assets.rb
+
+```ruby
+# root for relative files
+relative_root './app/assets'
+
+asset :admin do
+  js do
+    add 'js/admin/js_vendor/*'
+    add 'js/admin/js/*'
+    add 'js/shared/*'
+    add 'js/admin/index.coffee'
+  end
+
+  css do
+    add 'css/admin/index.scss'
+  end
+end
+```
 
 ## Extending
 
@@ -112,7 +158,7 @@ This is all that is needed to add support for TypeScript compilation.
 yarn add typescript
 ```
 
-```
+```ruby
 class LuxAssets::Element
   def compile_ts
     system "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'"
@@ -124,7 +170,7 @@ end
 
 You need to extend `LuxAssets` class and call method `add` with list of files or a proc.
 
-```
+```ruby
 module LuxAssets
   # include files from a plugin
   def plugin name
@@ -142,7 +188,7 @@ In `Rakefile` just add `require 'lux_assets'` and tasks will automaticly be adde
 
 Rake taks will call :env task to set up environment.
 
-```
+```ruby
 # Rakefile
 
 require 'lux_assets'
