@@ -5,8 +5,8 @@ class LuxAssets::Asset
 
   def initialize ext, name
     @ext    = ext == :js ? :js : :css
-    @name   = name
-    @files  = LuxAssets.to_h[ext][name]
+    @name   = name.to_s
+    @files  = LuxAssets.to_h[ext][@name]
     @target = "#{@ext}/#{@name}"
   end
 

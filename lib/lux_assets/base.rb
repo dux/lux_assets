@@ -23,7 +23,7 @@
 module LuxAssets
   extend self
 
-  CONFIG_PATH = Pathname.new ENV.fetch('ASSET_CONFIG') { './config/assets.rb' }
+  CONFIG_PATH = Pathname.new ENV.fetch('ASSETS_CONFIG') { './config/assets.rb' }
 
   ASSET_TYPES ||= {
     js:  ['js', 'coffee', 'ts'],
@@ -52,32 +52,12 @@ module LuxAssets
     class_eval &block
   end
 
-  def run what, cache_file=nil
-    puts what.yellow
-
-    stdin, stdout, stderr, wait_thread = Open3.popen3(what)
-
-    error = stderr.gets
-    while line = stderr.gets do
-      error += line
-    end
-
-    # node-sass prints to stderror on complete
-    error = nil if error && error.index('Rendering Complete, saving .css file...')
-
-    if error
-      cache_file.unlink if cache_file && cache_file.exist?
-
-      puts error.red
-    end
-  end
-
   def js name=nil, &block
-    add_files :js, name, block
+    add_files :js, name, &block
   end
 
   def css name=nil, &block
-    add_files :css, name, block
+    add_files :css, name, &block
   end
 
   # adds file or list of files
@@ -119,9 +99,17 @@ module LuxAssets
   end
 
   # get list of files in the resource
-  def files name
-    parts = name.split('/', 2)
-    to_h[parts.first.to_sym][parts[1]]
+  def files ext, name=nil
+    ext, name = ext.split('/', 2) unless name
+    ext = ext.to_sym
+
+    raise ArgumentError.new('name not deinfed') if name.empty?
+
+    to_h[ext][name.to_s]
+  end
+
+  def compile path
+    LuxAssets::Element.new(path).compile
   end
 
   def compile_all
@@ -172,6 +160,26 @@ module LuxAssets
     end
   end
 
+  def run what, cache_file=nil
+    puts what.yellow
+
+    stdin, stdout, stderr, wait_thread = Open3.popen3(what)
+
+    error = stderr.gets
+    while line = stderr.gets do
+      error += line
+    end
+
+    # node-sass prints to stderror on complete
+    error = nil if error && error.index('Rendering Complete, saving .css file...')
+
+    if error
+      cache_file.unlink if cache_file && cache_file.exist?
+
+      puts error.red
+    end
+  end
+
   private
 
   def add_local_files files
@@ -186,13 +194,14 @@ module LuxAssets
     files
   end
 
-  def add_files ext, name, block
-    @name = name.to_s if name
-    return Asset.new ext, @name unless block
-
-    @files = []
-    @ext   = ext
-    class_eval &block
-    @assets[ext][@name] = @files
+  def add_files ext, name=nil, &block
+    if block_given?
+      @files = []
+      @ext   = ext
+      class_eval &block
+      @assets[ext][@name] = @files
+    else
+      Asset.new ext, name
+    end
   end
 end
