@@ -1,7 +1,7 @@
 # manifest file
 
 module LuxAssets::Manifest
-  MANIFEST = Pathname.new('./public/manifest.json')
+  MANIFEST = Pathname.new(ENV.fetch('ASSETS_MANIFEST') { './public/manifest.json' })
 
   extend self
 
