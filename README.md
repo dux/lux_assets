@@ -10,6 +10,19 @@ Lightweight web assets packer that loves simplicity.
 * autoprefixer, minify, gzip the output
 * add rake tasks
 
+Assets pipeline
+
+* get list of files or data
+* compile every file individually and join the result to single file
+* css specific
+  * scan css source and put sh1 data stamp to files found in ./public dir
+  * autoprefixer
+* js specific
+  * babel
+* minify
+* sha1 prefix, gzip, add to manifest
+
+
 ## Instalation
 
 Add `lux_assets` gem to `Gemfile` and then `bundle install`

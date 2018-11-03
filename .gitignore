@@ -1,6 +1,6 @@
-node_modules
+node_modules/
+tmp/
 package.json
+yarn.lock
 .edit
 *.gem
-tmp/
-yarn.lock
