@@ -4,11 +4,25 @@ require 'thor'
 require 'colorize'
 require 'awesome_print'
 
-require_relative '../lib/lux_assets'
+###
+
+if ARGV[0]
+  if File.exist?('./config/application.rb')
+    require './config/application.rb'
+  end
+
+  if !defined?(LuxAssets) && File.exist?('./config/environment.rb')
+    require './config/environment.rb'
+  end
+
+  if !defined?(LuxAssets)
+    require_relative '../lib/lux_assets'
+  end
+end
 
 ###
 
-module Cli
+module ::Cli
   extend self
 
   def run what
