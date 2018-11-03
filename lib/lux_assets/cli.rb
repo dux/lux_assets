@@ -75,7 +75,7 @@ module LuxAssets::Cli
         for file in values
           if file.mtime > last_change
             changed = true
-            LuxAssets::Element.new(key).compile :force
+            LuxAssets::Element.new(key).compile force: true
           end
         end
       end

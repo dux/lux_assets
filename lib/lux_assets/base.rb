@@ -90,6 +90,8 @@ module LuxAssets
 
   # compile all assets
   def compile_all
+    ENV['ASSETS_ENV'] = 'production'
+
     # generate master file for every resource
     for ext in [:js, :css]
       for name in to_h[ext].keys

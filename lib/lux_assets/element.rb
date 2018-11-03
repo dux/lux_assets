@@ -3,10 +3,13 @@
 class LuxAssets::Element
   def initialize source
     @source = Pathname.new source
-    @cache = Pathname.new './tmp/assets/%s' % source.sub(/^\.\//, '').gsub('/','-')
+
+    source  = source.sub(/^\.\//, '').sub(/^\//, '').gsub('/', '-')
+    source  = '%s-%s' % [production? ? :p : :d, source] if content_type == 'text/css'
+    @cache  = Pathname.new './tmp/assets/%s' % source
   end
 
-  def compile force=false
+  def compile force:nil
     method_name = 'compile_%s' % @source.to_s.split('.').last.downcase
 
     if respond_to?(method_name, true)
@@ -18,7 +21,6 @@ class LuxAssets::Element
 
   def content_type
     @ext ||= @source.to_s.split('.').last.to_sym
-
     [:css, :scss].include?(@ext) ? 'text/css' : 'text/javascript'
   end
 
@@ -28,7 +30,7 @@ class LuxAssets::Element
 
   def production?
     # if building from Rake then we are compiling for production
-    defined?(Rake)
+    defined?(Rake) || ENV['ASSETS_ENV'] == 'production'
   end
 
   def cached
