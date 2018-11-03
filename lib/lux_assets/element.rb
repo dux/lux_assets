@@ -3,7 +3,7 @@
 class LuxAssets::Element
   def initialize source
     @source = Pathname.new source
-    @cache = Pathname.new './tmp/assets/%s' % source.gsub('/','-')
+    @cache = Pathname.new './tmp/assets/%s' % source.sub(/^\.\//, '').gsub('/','-')
   end
 
   def compile force=false
@@ -28,7 +28,7 @@ class LuxAssets::Element
 
   def production?
     # if building from Rake then we are compiling for production
-    defined?(Rake) || $0.include?('/lux_assets')
+    defined?(Rake)
   end
 
   def cached
@@ -39,20 +39,22 @@ class LuxAssets::Element
     coffee_path = './node_modules/coffee-script/bin/coffee'
     coffee_opts = production? ? '-cp' : '-Mcp --no-header'
 
-    LuxAssets::Cli.run "#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'", @cache
+    if LuxAssets::Cli.run("#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'", cache_file: @cache, message: "Compile Coffee: #{@source}")
+      data = @cache.read
+      data = data.gsub(%r{//#\ssourceURL=[\w\-\.\/]+/app/assets/}, '//# sourceURL=/raw_asset/')
 
-    data = @cache.read
-    data = data.gsub(%r{//#\ssourceURL=[\w\-\.\/]+/app/assets/}, '//# sourceURL=/raw_asset/')
+      @cache.write data
 
-    @cache.write data
-
-    data
+      data
+    else
+      nil
+    end
   end
 
   def compile_scss
     node_sass = './node_modules/node-sass/bin/node-sass'
     node_opts = production? ? '--output-style compressed' : '--source-comments'
-    LuxAssets::Cli.run "#{node_sass} #{node_opts} '#{@source}' '#{@cache}'", @cache
+    LuxAssets::Cli.run "#{node_sass} #{node_opts} '#{@source}' '#{@cache}'", cache_file: @cache, message: "Compile SCSS: #{@source}"
     @cache.read
   end
   alias :compile_sass :compile_scss
@@ -63,7 +65,7 @@ class LuxAssets::Element
   end
 
   def compile_ts
-    LuxAssets::Cli.run "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'"
+    LuxAssets::Cli.run "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'", cache_file: @cache, message: "Compile TypeScript: #{@source}"
   end
 
 end

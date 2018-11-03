@@ -15,8 +15,8 @@ module LuxAssets::Cli
     puts text
   end
 
-  def run what, cache_file=nil
-    puts what.yellow
+  def run what, opts={}
+    puts (opts[:message] || what).yellow
 
     stdin, stdout, stderr, wait_thread = Open3.popen3(what)
 
@@ -29,8 +29,15 @@ module LuxAssets::Cli
     error = nil if error && error.include?('Rendering Complete, saving .css file...')
 
     if error
-      cache_file.unlink if cache_file && cache_file.exist?
+      puts '--- command '
+      puts what.yellow
+      puts '--- error response'
+      opts[:cache_file].unlink if opts[:cache_file] && opts[:cache_file].exist?
       warn error
+      puts '--- end'
+      false
+    else
+      true
     end
   end
 
@@ -47,12 +54,13 @@ module LuxAssets::Cli
 
     files = list.inject({}) do |h, file|
       if file.to_s.end_with?('.scss')
-        # if target file is scss monitor all child css and scss files
+        # if target file is scss, monitor all child css and scss files
         h[file.to_s] = Dir['%s/**/*' % file.dirname]
           .select { |file| file.end_with?('.scss') || file.end_with?('.css') }
           .map { |it| Pathname.new it }
 
       else
+        # othervise monitor only target file
         h[file.to_s] = [file]
       end
       h

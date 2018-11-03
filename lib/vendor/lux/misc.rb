@@ -31,3 +31,28 @@ Lux.app.before do
     body file.exist? ? file.read : "error: File not found"
   end
 end
+
+# additional info for "lux config" cli
+Lux::Config.info do
+  puts
+  puts 'assets:'
+  for ext in LuxAssets.to_h.keys
+    for key, value in LuxAssets.to_h[ext]
+      name = '  LuxAsset.%s(:%s)' % [ext, key]
+      print name.ljust(35)
+      puts ' - %s' % value.length.pluralize(:file)
+    end
+  end
+end
+
+# include files from a plugin
+module LuxAssets
+  def plugin name
+    # load pluigin if needed
+    Lux.plugin name
+
+    plugin = Lux.plugin.get name
+    add '%s/**' % plugin[:folder]
+  end
+end
+

@@ -101,7 +101,7 @@ module LuxAssets
     # gzip if needed
     files = Dir['./public/assets/*.css'] + Dir['./public/assets/*.js']
     files.each do |file|
-      LuxAssets::Cli.run 'gzip -k %s' % file unless File.exist?('%s.gz' % file)
+      LuxAssets::Cli.run('gzip -k %s' % file, message: "Gzip: #{file}") unless File.exist?('%s.gz' % file)
     end
 
     # touch all files and reset the timestamp

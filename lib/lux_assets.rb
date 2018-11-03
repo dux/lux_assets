@@ -13,9 +13,8 @@ require_relative './lux_assets/manifest'
 
 # lux framework bindings
 if defined?(Lux)
+  require_relative './vendor/lux/misc'
   require_relative './vendor/lux/assets_helper'
-  require_relative './vendor/lux/assets_plugin'
-  require_relative './vendor/lux/assets_routes'
 end
 
 # rake bindings
