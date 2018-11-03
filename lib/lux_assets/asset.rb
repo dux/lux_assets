@@ -20,7 +20,7 @@ class LuxAssets::Asset
   def compile
     @data = []
 
-    die "No files found for [#{@ext}/#{@name}]" unless @files[0]
+    LuxAssets::Cli.die "No files found for [#{@ext}/#{@name}]" unless @files[0]
 
     for file in @files
       if file.is_a?(Proc)
@@ -47,15 +47,18 @@ class LuxAssets::Asset
   def tag_public_assets
     data = @asset_path.read
     data = data.gsub(/url\(([^\)]+)\)/) do
-      if $1.include?('data:') || $1.include?('#') || $1.include?('?')
+      if $1.include?('data:') || $1.include?('#') || $1.include?('?') || $1.include?('::')
         'url(%s)' % $1
       else
         path = $1.gsub(/^['"]|['"]$/, '')
         path = path[0,1] == '/' ? Pathname.new('./public%s' % path) : Pathname.new('./public/assets').join(path)
 
-        LuxAssets.die 'Resource "%s" referenced in "%s/%s" but not found' % [path, @ext, @name] unless path.exist?
-
-        'url("%s?%s")' % [path.to_s.sub('./public', ''), Digest::SHA1.hexdigest(path.read)[0, 6]]
+        if path.exist?
+          'url("%s?%s")' % [path.to_s.sub('./public', ''), Digest::SHA1.hexdigest(path.read)[0, 6]]
+        else
+          LuxAssets::Cli.warn 'Resource "%s" referenced in "%s/%s" but not found' % [path, @ext, @name]
+          'url("%s")' % path
+        end
       end
     end
 
@@ -75,7 +78,7 @@ class LuxAssets::Asset
   def compile_js
     save_data @data.join(";\n") do
       # babel fix and minify
-      LuxAssets.run 'node_modules/babel-cli/.bin/babel --minified --no-comments --compact true -o "%{file}" "%{file}"' % { file: @asset_path }
+      LuxAssets::Cli.run 'node_modules/babel-cli/.bin/babel --minified --no-comments --compact true -o "%{file}" "%{file}"' % { file: @asset_path }
     end
   end
 
@@ -84,7 +87,7 @@ class LuxAssets::Asset
       tag_public_assets
 
       #autoprefixer
-      LuxAssets.run './node_modules/.bin/autoprefixer-cli %s' % @asset_path
+      LuxAssets::Cli.run './node_modules/.bin/autoprefixer-cli %s' % @asset_path
     end
   end
 end

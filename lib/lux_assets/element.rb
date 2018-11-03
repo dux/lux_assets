@@ -1,4 +1,5 @@
 # One file that can be scss, js, coffee, ts, etc...
+
 class LuxAssets::Element
   def initialize source
     @source = Pathname.new source

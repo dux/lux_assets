@@ -1,7 +1,6 @@
 # /compiled_asset/www/js/pjax.coffee
 # /raw_asset/www/js/pjax.coffee
 Lux.app.before do
-  # skip /favicon.ico that forces refresh
   next unless nav.path[1]
   next unless Lux.config(:compile_assets)
 
