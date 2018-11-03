@@ -27,7 +27,7 @@ class LuxAssets::Element
 
   def production?
     # if building from Rake then we are compiling for production
-    ENV['LUX_ASSETS_ENV'] == 'production' || defined?(Rake)
+    defined?(Rake) || $0.include?('/lux_assets')
   end
 
   def cached
@@ -55,6 +55,7 @@ class LuxAssets::Element
     @cache.read
   end
   alias :compile_sass :compile_scss
+  alias :compile_css :compile_sass
 
   def compile_js
     ";\n%s\n;" % @source.read

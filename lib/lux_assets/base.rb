@@ -1,24 +1,4 @@
-# LuxAssets.configure do
-#   asset :admin do
-#     js do
-#       add 'js/admin/js_vendor/*'
-#       add 'js/admin/js/*'
-#       add 'js/shared/*'
-#       add 'js/admin/index.coffee'
-#     end
-#     css do
-#       add 'css/admin/index.scss'
-#     end
-#   end
-# end
-# ...
-
-# LuxAssets.css('admin').files
-# LuxAssets.css(:admin).compile
-
-# LuxAssets.css(:admin).compile_all do |name, path|
-#   puts "Compile #{name} -> #{path}"
-# end
+# Main assets module
 
 module LuxAssets
   extend self
@@ -39,7 +19,7 @@ module LuxAssets
   end
 
   def die text
-    puts text
+    puts text.try(:red)
     exit
   end
 
@@ -108,10 +88,12 @@ module LuxAssets
     to_h[ext][name.to_s]
   end
 
+  # compile single asset
   def compile path
     LuxAssets::Element.new(path).compile
   end
 
+  # compile all assets
   def compile_all
     # generate master file for every resource
     for ext in [:js, :css]
@@ -127,11 +109,12 @@ module LuxAssets
       LuxAssets.run 'gzip -k %s' % file unless File.exist?('%s.gz' % file)
     end
 
-    # touch all files reset timestamp
+    # touch all files and reset the timestamp
     Dir['./public/assets/*']
       .each { |file| system 'touch -t 201001010101 %s' % file }
   end
 
+  # get all files as a hash
   def to_h
     unless @assets_loaded
       die 'Assets file not found in %s' % CONFIG_PATH unless CONFIG_PATH.exist?
@@ -149,13 +132,21 @@ module LuxAssets
       puts ext.to_s.upcase.green
       value_hash.each do |key, files|
         puts '  %s' % key.green
+
+        total = 0
+
         files.each_with_index do |file, i|
           if File.exist?(file)
-            puts '  %s kb - %s' % [(File.size(file)/1024.to_f).round(1).to_s.rjust(6), file]
+            size  = File.size(file)
+            total += size
+            puts '  %s kB - %s' % [(size/1024.to_f).round(1).to_s.rjust(6), file]
           else
             puts '  %s' % file
           end
         end
+
+        total = '%s kB in total' % (total/1024.to_f).round(1).to_s
+        puts total.rjust(20)
       end
     end
   end
