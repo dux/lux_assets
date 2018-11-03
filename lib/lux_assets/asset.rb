@@ -1,7 +1,6 @@
 # Asset group, single asset that produces target css or js
 
 class LuxAssets::Asset
-  PUBLIC_ASSETS = './public/assets'
 
   def initialize ext, name
     @ext    = ext == :js ? :js : :css
@@ -44,12 +43,31 @@ class LuxAssets::Asset
 
   private
 
+  # add sha1 tag to referenced files in css
+  def tag_public_assets
+    data = @asset_path.read
+    data = data.gsub(/url\(([^\)]+)\)/) do
+      if $1.include?('data:') || $1.include?('#') || $1.include?('?')
+        'url(%s)' % $1
+      else
+        path = $1.gsub(/^['"]|['"]$/, '')
+        path = path[0,1] == '/' ? Pathname.new('./public%s' % path) : Pathname.new('./public/assets').join(path)
+
+        LuxAssets.die 'Resource "%s" referenced in "%s/%s" but not found' % [path, @ext, @name] unless path.exist?
+
+        'url("%s?%s")' % [path.to_s.sub('./public', ''), Digest::SHA1.hexdigest(path.read)[0, 6]]
+      end
+    end
+
+    @asset_path.write data
+  end
+
   def save_data data
     @asset_file = '/assets/%s' % (@target.sub('/', '-') + '-' + Digest::SHA1.hexdigest(data) + '.' + @ext.to_s)
-    @asset_path = "./public#{@asset_file}"
+    @asset_path = Pathname.new "./public#{@asset_file}"
 
     if LuxAssets::Manifest.add(@target, @asset_file)
-      File.write(@asset_path, data)
+      @asset_path.write data
       yield
     end
   end
@@ -63,6 +81,8 @@ class LuxAssets::Asset
 
   def compile_css
     save_data @data.join($/) do
+      tag_public_assets
+
       #autoprefixer
       LuxAssets.run './node_modules/.bin/autoprefixer-cli %s' % @asset_path
     end
