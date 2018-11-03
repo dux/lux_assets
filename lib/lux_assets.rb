@@ -7,6 +7,7 @@ require 'open3'
 # gem files
 require_relative './lux_assets/base'
 require_relative './lux_assets/asset'
+require_relative './lux_assets/cli'
 require_relative './lux_assets/element'
 require_relative './lux_assets/manifest'
 

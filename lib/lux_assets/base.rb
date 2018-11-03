@@ -18,11 +18,6 @@ module LuxAssets
     @relative_root
   end
 
-  def die text
-    puts text.try(:red)
-    exit
-  end
-
   def asset name
     @name = name.to_s
     yield
@@ -73,7 +68,7 @@ module LuxAssets
       if files[0]
         add_local_files files
       else
-        die 'No files found in "%s -> :%s" (%s)'.red % [@ext, @name, added]
+        LuxAssets::Cli.die 'No files found in "%s -> :%s" (%s)'.red % [@ext, @name, added]
       end
     end
   end
@@ -106,7 +101,7 @@ module LuxAssets
     # gzip if needed
     files = Dir['./public/assets/*.css'] + Dir['./public/assets/*.js']
     files.each do |file|
-      LuxAssets.run 'gzip -k %s' % file unless File.exist?('%s.gz' % file)
+      LuxAssets::Cli.run 'gzip -k %s' % file unless File.exist?('%s.gz' % file)
     end
 
     # touch all files and reset the timestamp
@@ -117,7 +112,7 @@ module LuxAssets
   # get all files as a hash
   def to_h
     unless @assets_loaded
-      die 'Assets file not found in %s' % CONFIG_PATH unless CONFIG_PATH.exist?
+      LuxAssets::Cli.die 'Assets file not found in %s' % CONFIG_PATH unless CONFIG_PATH.exist?
       @assets_loaded = true
       eval CONFIG_PATH.read
     end
@@ -148,26 +143,6 @@ module LuxAssets
         total = '%s kB in total' % (total/1024.to_f).round(1).to_s
         puts total.rjust(20)
       end
-    end
-  end
-
-  def run what, cache_file=nil
-    puts what.yellow
-
-    stdin, stdout, stderr, wait_thread = Open3.popen3(what)
-
-    error = stderr.gets
-    while line = stderr.gets do
-      error += line
-    end
-
-    # node-sass prints to stderror on complete
-    error = nil if error && error.index('Rendering Complete, saving .css file...')
-
-    if error
-      cache_file.unlink if cache_file && cache_file.exist?
-
-      puts error.red
     end
   end
 
