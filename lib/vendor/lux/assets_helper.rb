@@ -24,38 +24,52 @@ module HtmlHelper
   def asset file, opts={}
     opts = { dev_file: opts } unless opts.class == Hash
 
-    # return joined assets if symbol given
-    # = asset :main -> asset("css/main") + asset("js/main")
-    return [asset("css/#{file}"), asset("js/#{file}")].join($/) if
-      file.is_a?(Symbol)
+    if Lux.config(:compile_assets)
+      # return second link if it is defined and we are in dev mode
+      return asset_include opts[:dev_file] if opts[:dev_file]
 
-    # return second link if it is defined and we are in dev mode
-    return asset_include opts[:dev_file] if opts[:dev_file] && Lux.config(:compile_assets)
+      # return internet links
+      return asset_include file if file.starts_with?('/') || file.starts_with?('http')
 
-    # return internet links
-    return asset_include file if file.starts_with?('/') || file.starts_with?('http')
+      # try to create list of incuded files and show every one of them
+      files = LuxAssets.files(file) || []
+      data = files.inject([]) do |total, asset|
+        if asset.is_a?(Proc)
+          tag_name = file.include?('css') ? :style : :script
+          total.push({}.tag tag_name, asset.call)
+        else
+          total.push asset_include '/compiled_asset/' + asset
+        end
+      end
 
-    # return asset link in production or fail unless able
-    unless Lux.config(:compile_assets)
+      data.map{ |it| it.sub(/^\s\s/,'') }.join("\n")
+    else
+      # return asset link in production or fail unless able
       manifest = Lux.ram_cache('asset-manifest') { JSON.load Lux.root.join('public/manifest.json').read }
       mfile    = manifest['files'][file]
 
-      raise 'Compiled asset link for "%s" not found in manifest.json' % file if mfile.empty?
+      if mfile.empty?
+        unless opts[:raise].is_a?(FalseClass)
+          raise 'Compiled asset link for "%s" not found in manifest.json' % file
+        end
 
-      return asset_include(Lux.config.assets_root.to_s + mfile, opts)
-    end
-
-    # try to create list of incuded files and show every one of them
-    data = LuxAssets.files(file).inject([]) do |total, asset|
-      if asset.is_a?(Proc)
-        tag_name = file.include?('css') ? :style : :script
-        total.push({}.tag tag_name, asset.call)
+        nil
       else
-        total.push asset_include '/compiled_asset/' + asset
+        return asset_include(Lux.config.assets_root.to_s + mfile, opts)
       end
     end
+  end
 
-    data.map{ |it| it.sub(/^\s\s/,'') }.join("\n")
+  # assets :vendor, :main
+  def assets *args
+    total = []
+    [:css, :js].each do |ext|
+      args.map do |group|
+        data = asset("#{ext}/#{group}", raise: false)
+        total.push data if data.present?
+      end
+    end
+    total.join($/)
   end
 
 end
