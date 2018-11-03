@@ -38,16 +38,41 @@ module LuxAssets::Cli
   def monitor
     puts 'Lux assets - looking for file changes'
 
-    files       = LuxAssets.to_h.values.map(&:values).flatten.map { |it| Pathname.new it }
+    list = LuxAssets
+      .to_h
+      .values
+      .map(&:values)
+      .flatten
+      .map { |it| Pathname.new it }
+
+    files = list.inject({}) do |h, file|
+      if file.to_s.end_with?('.scss')
+        # if target file is scss monitor all child css and scss files
+        h[file.to_s] = Dir['%s/**/*' % file.dirname]
+          .select { |file| file.end_with?('.scss') || file.end_with?('.css') }
+          .map { |it| Pathname.new it }
+
+      else
+        h[file.to_s] = [file]
+      end
+      h
+    end
+
     last_change = Time.now
 
     while true
-      for file in files
-        if file.mtime > last_change
-          last_change = Time.now
-          LuxAssets.compile file.to_s
+      changed = false
+
+      for key, values in files
+        for file in values
+          if file.mtime > last_change
+            changed = true
+            LuxAssets::Element.new(key).compile :force
+          end
         end
       end
+
+      last_change = Time.now if changed
 
       sleep 2
     end

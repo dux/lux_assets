@@ -6,11 +6,11 @@ class LuxAssets::Element
     @cache = Pathname.new './tmp/assets/%s' % source.gsub('/','-')
   end
 
-  def compile
+  def compile force=false
     method_name = 'compile_%s' % @source.to_s.split('.').last.downcase
 
     if respond_to?(method_name, true)
-      cached || send(method_name)
+      (!force && cached) || send(method_name)
     else
       @source.read
     end
