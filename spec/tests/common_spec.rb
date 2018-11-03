@@ -35,5 +35,11 @@ describe LuxAssets do
     `rm -rf ./public/assets`
     Dir.rmdir('./public') if Dir.entries('./public').length == 2
   end
+
+  it 'deletes the manifest' do
+    if LuxAssets::Manifest::MANIFEST.exist?
+      LuxAssets::Manifest::MANIFEST.delete
+    end
+  end
 end
 
