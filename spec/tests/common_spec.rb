@@ -32,11 +32,12 @@ describe LuxAssets do
     expect(css).to include('-webkit')
 
     expect(Dir.entries('./public/assets').length > 8).to be true
-    `rm -rf ./public/assets`
-    Dir.rmdir('./public') if Dir.entries('./public').length == 2
   end
 
-  it 'deletes the manifest' do
+  it 'deletes folders and files' do
+    `rm -rf ./public/assets`
+    Dir.rmdir('./public') if Dir.entries('./public').length == 2
+
     if LuxAssets::Manifest::MANIFEST.exist?
       LuxAssets::Manifest::MANIFEST.delete
     end

@@ -88,6 +88,11 @@ class AssetsCli < Thor
     Cli.run 'rm ./public/manifest.json'
   end
 
+  desc :monitor, 'Montitor and compile changed files'
+  def monitor
+    LuxAssets::Cli.monitor
+  end
+
 end
 
 AssetsCli.start ARGV

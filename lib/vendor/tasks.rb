@@ -28,6 +28,11 @@ namespace :assets do
     LuxAssets.examine
   end
 
+  desc 'Monitor for file changes'
+  task monitor: :env do
+    LuxAssets::Cli.monitor
+  end
+
   desc 'Upload assets to S3'
   task :s3_upload do
     puts 'aws s3 sync ./public s3://bucket.location --cache-control "max-age=31536000, public"'

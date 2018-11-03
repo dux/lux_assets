@@ -41,6 +41,7 @@ Commands:
   lux_assets compile         # Compile assets for production
   lux_assets help [COMMAND]  # Describe available commands or one specific command
   lux_assets install         # Install all needed packages via yarn
+  lux_assets monitor         # Montitor and compile changed files
   lux_assets show            # Show all files/data in manifest
 ```
 

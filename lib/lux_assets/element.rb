@@ -39,7 +39,7 @@ class LuxAssets::Element
     coffee_path = './node_modules/coffee-script/bin/coffee'
     coffee_opts = production? ? '-cp' : '-Mcp --no-header'
 
-    LuxAssets.run "#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'", @cache
+    LuxAssets::Cli.run "#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'", @cache
 
     data = @cache.read
     data = data.gsub(%r{//#\ssourceURL=[\w\-\.\/]+/app/assets/}, '//# sourceURL=/raw_asset/')
@@ -52,7 +52,7 @@ class LuxAssets::Element
   def compile_scss
     node_sass = './node_modules/node-sass/bin/node-sass'
     node_opts = production? ? '--output-style compressed' : '--source-comments'
-    LuxAssets.run "#{node_sass} #{node_opts} '#{@source}' '#{@cache}'", @cache
+    LuxAssets::Cli.run "#{node_sass} #{node_opts} '#{@source}' '#{@cache}'", @cache
     @cache.read
   end
   alias :compile_sass :compile_scss
@@ -63,7 +63,7 @@ class LuxAssets::Element
   end
 
   def compile_ts
-    LuxAssets.run "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'"
+    LuxAssets::Cli.run "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'"
   end
 
 end

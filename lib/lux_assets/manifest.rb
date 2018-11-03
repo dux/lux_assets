@@ -2,6 +2,7 @@
 
 module LuxAssets::Manifest
   MANIFEST = Pathname.new(ENV.fetch('ASSETS_MANIFEST') { './public/manifest.json' })
+  MANIFEST.write '{"files":{}}' unless MANIFEST.exist?
 
   extend self
 
@@ -20,10 +21,6 @@ module LuxAssets::Manifest
     json = JSON.load MANIFEST.read
     json['files'][name]
   end
-
-  ###
-
-  MANIFEST.write '{"files":{}}' unless MANIFEST.exist?
 end
 
 

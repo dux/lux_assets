@@ -112,7 +112,7 @@ module LuxAssets
   # get all files as a hash
   def to_h
     unless @assets_loaded
-      LuxAssets::Cli.die 'Assets file not found in %s' % CONFIG_PATH unless CONFIG_PATH.exist?
+      LuxAssets::Cli.die 'Assets rb config file not found in %s' % CONFIG_PATH unless CONFIG_PATH.exist?
       @assets_loaded = true
       eval CONFIG_PATH.read
     end
