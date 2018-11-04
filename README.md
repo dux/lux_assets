@@ -2,18 +2,20 @@
 
 Lightweight web assets packer that loves simplicity.
 
+[![asciicast](https://asciinema.org/a/IanaNAq9CDKvUg7dweqxzhoAV.svg)](https://asciinema.org/a/IanaNAq9CDKvUg7dweqxzhoAV)
+
 * framework agnostic, use anywhere
 * compiles js, coffee, typescript, css, sass "out of the box"
 * keeps manifest in a single file
 * plugable to handle any other extension
 * update manifest file for production
 * autoprefixer, minify, gzip the output
-* add rake tasks
+* adds rake tasks
 
 Assets pipeline
 
 * get list of files or data
-* compile every file individually and join the result to single file
+* individually compile every asset, join the result in a single file
 * css specific
   * scan css source and put sh1 data stamp to files found in ./public dir
   * autoprefixer
