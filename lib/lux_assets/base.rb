@@ -84,14 +84,13 @@ module LuxAssets
   end
 
   # compile single asset
-  def compile path
-    LuxAssets::Element.new(path).compile
+  def compile path, opts={}
+    opts[:production] = false if opts[:production].nil?
+    LuxAssets::Element.new(path).send :compile, opts
   end
 
   # compile all assets
   def compile_all
-    ENV['ASSETS_ENV'] = 'production'
-
     # generate master file for every resource
     for ext in [:js, :css]
       for name in to_h[ext].keys

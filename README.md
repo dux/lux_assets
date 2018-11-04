@@ -128,15 +128,16 @@ LuxAssets.files(:js, :main)
 LuxAssets.files('js/main')
 LuxAssets.js(:main).files
 
-# compile single asset
+# compile single asset with debug info for dev
 LuxAssets.compile('js/main/index.coffee')
 LuxAssets.compile('css/main/index.scss')
 
-# compile file group
+# compile file group for production
 LuxAssets.js(:main).compile
 LuxAssets.css(:main).compile
+LuxAssets.css(:main).compile
 
-# compile all assets
+# compile all assets for production
 LuxAssets.compile_all do |name, path|
   puts "Compile #{name.green} -> #{path}"
 end

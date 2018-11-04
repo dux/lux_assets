@@ -1,22 +1,13 @@
 # One file that can be scss, js, coffee, ts, etc...
 
 class LuxAssets::Element
+
   def initialize source
     @source = Pathname.new source
 
     source  = source.sub(/^\.\//, '').sub(/^\//, '').gsub('/', '-')
-    source  = '%s-%s' % [production? ? :p : :d, source] if content_type == 'text/css'
+    source  = '%s-%s' % [@production ? :p : :d, source] if content_type == 'text/css'
     @cache  = Pathname.new './tmp/assets/%s' % source
-  end
-
-  def compile force:nil
-    method_name = 'compile_%s' % @source.to_s.split('.').last.downcase
-
-    if respond_to?(method_name, true)
-      (!force && cached) || send(method_name)
-    else
-      @source.read
-    end
   end
 
   def content_type
@@ -28,9 +19,16 @@ class LuxAssets::Element
 
   private
 
-  def production?
-    # if building from Rake then we are compiling for production
-    defined?(Rake) || ENV['ASSETS_ENV'] == 'production'
+  # use LuxAsset.compile
+  def compile force:nil, production:nil
+    @production = production || false
+    method_name = 'compile_%s' % @source.to_s.split('.').last.downcase
+
+    if respond_to?(method_name, true)
+      (!force && cached) || send(method_name)
+    else
+      @source.read
+    end
   end
 
   def cached
@@ -39,7 +37,7 @@ class LuxAssets::Element
 
   def compile_coffee
     coffee_path = './node_modules/coffee-script/bin/coffee'
-    coffee_opts = production? ? '-cp' : '-Mcp --no-header'
+    coffee_opts = @production ? '-cp' : '-Mcp --no-header'
 
     if LuxAssets::Cli.run("#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'", cache_file: @cache, message: "Compile Coffee: #{@source}")
       data = @cache.read
@@ -55,7 +53,7 @@ class LuxAssets::Element
 
   def compile_scss
     node_sass = './node_modules/node-sass/bin/node-sass'
-    node_opts = production? ? '--output-style compressed' : '--source-comments'
+    node_opts = @production ? '--output-style compressed' : '--source-comments'
     LuxAssets::Cli.run "#{node_sass} #{node_opts} '#{@source}' '#{@cache}'", cache_file: @cache, message: "Compile SCSS: #{@source}"
     @cache.read
   end

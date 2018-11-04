@@ -63,6 +63,7 @@ module LuxAssets::Cli
         # othervise monitor only target file
         h[file.to_s] = [file]
       end
+
       h
     end
 
@@ -75,7 +76,7 @@ module LuxAssets::Cli
         for file in values
           if file.mtime > last_change
             changed = true
-            LuxAssets::Element.new(key).compile force: true
+            LuxAssets.compile key, force: true
           end
         end
       end

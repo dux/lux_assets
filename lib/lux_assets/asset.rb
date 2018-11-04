@@ -26,7 +26,7 @@ class LuxAssets::Asset
       if file.is_a?(Proc)
         @data.push file.call
       else
-        @data.push LuxAssets::Element.new(file).compile
+        @data.push LuxAssets.compile file, production: true
       end
     end
 
