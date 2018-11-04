@@ -3,7 +3,7 @@
 module LuxAssets
   extend self
 
-  CONFIG_PATH = Pathname.new ENV.fetch('ASSETS_CONFIG') { './config/assets.rb' }
+  CONFIG_PATH ||= Pathname.new ENV.fetch('ASSETS_CONFIG') { './config/assets.rb' }
 
   ASSET_TYPES ||= {
     js:  ['js', 'coffee', 'ts'],
@@ -76,11 +76,7 @@ module LuxAssets
   # get list of files in the resource
   def files ext, name=nil
     ext, name = ext.split('/', 2) unless name
-    ext = ext.to_sym
-
-    raise ArgumentError.new('name not deinfed') if name.empty?
-
-    to_h[ext][name.to_s]
+    Asset.new(ext, name).files
   end
 
   # compile single asset

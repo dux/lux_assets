@@ -3,9 +3,10 @@
 class LuxAssets::Asset
 
   def initialize ext, name
-    @ext    = ext == :js ? :js : :css
+    raise ArgumentError.new('name not deinfed') if name.empty?
+    @ext    = ext.to_sym == :js ? :js : :css
     @name   = name.to_s
-    @files  = LuxAssets.to_h[ext][@name]
+    @files  = LuxAssets.to_h[@ext][@name]
     @target = "#{@ext}/#{@name}"
   end
 
