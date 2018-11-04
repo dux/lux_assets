@@ -6,6 +6,14 @@ require 'awesome_print'
 
 ###
 
+if ['-v', '--version'].include?(ARGV[0])
+  puts 'v%s' % Pathname.new(__dir__).join('../.version').read.chomp
+  exit
+end
+
+###
+
+# Load app if possible
 if ARGV[0]
   if File.exist?('./config/application.rb')
     require './config/application.rb'
@@ -92,7 +100,6 @@ class AssetsCli < Thor
   def monitor
     LuxAssets::Cli.monitor
   end
-
 end
 
 AssetsCli.start ARGV
