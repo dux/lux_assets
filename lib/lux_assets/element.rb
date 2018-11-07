@@ -15,11 +15,7 @@ class LuxAssets::Element
     [:css, :scss].include?(@ext) ? 'text/css' : 'text/javascript'
   end
 
-  ###
-
-  private
-
-  # use LuxAsset.compile
+  # use LuxAsset.compile if possible
   def compile force:nil, production:nil
     @production = production || false
     method_name = 'compile_%s' % @source.to_s.split('.').last.downcase
@@ -30,6 +26,10 @@ class LuxAssets::Element
       @source.read
     end
   end
+
+  ###
+
+  private
 
   def cached
     @cache.exist? && (@cache.ctime > @source.ctime) ? @cache.read : false

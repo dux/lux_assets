@@ -102,4 +102,8 @@ class AssetsCli < Thor
   end
 end
 
+###
+
+trap("SIGINT") { Cli.die 'ctrl+c exit' }
+
 AssetsCli.start ARGV

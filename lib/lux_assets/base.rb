@@ -123,7 +123,7 @@ module LuxAssets
     data.each do |ext, value_hash|
       puts ext.to_s.upcase.green
       value_hash.each do |key, files|
-        puts '  %s' % key.green
+        puts '  %s' % key.to_s.green
 
         total = 0
 
