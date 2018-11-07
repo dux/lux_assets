@@ -24,12 +24,12 @@ module HtmlHelper
   def asset file, opts={}
     opts = { dev_file: opts } unless opts.class == Hash
 
+    # return internet links
+    return asset_include file if file.starts_with?('/') || file.starts_with?('http')
+
     if Lux.config(:compile_assets)
       # return second link if it is defined and we are in dev mode
       return asset_include opts[:dev_file] if opts[:dev_file]
-
-      # return internet links
-      return asset_include file if file.starts_with?('/') || file.starts_with?('http')
 
       # try to create list of incuded files and show every one of them
       files = LuxAssets.files(file) || []
