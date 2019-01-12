@@ -1,5 +1,7 @@
 # Asset group, single asset that produces target css or js
 
+require 'erb'
+
 class LuxAssets::Asset
 
   def initialize ext, name

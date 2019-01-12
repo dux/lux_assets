@@ -15,8 +15,12 @@ module LuxAssets::Cli
     puts text
   end
 
+  def info text
+    puts text.yellow
+  end
+
   def run what, opts={}
-    puts (opts[:message] || what).yellow
+    info (opts[:message] || what)
 
     stdin, stdout, stderr, wait_thread = Open3.popen3(what)
 

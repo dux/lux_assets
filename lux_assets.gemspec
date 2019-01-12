@@ -8,7 +8,7 @@ Gem::Specification.new 'lux_assets' do |gem|
   gem.license     = 'MIT'
   gem.author      = 'Dino Reic'
   gem.email       = 'rejotl@gmail.com'
-  gem.files       = Dir['./**/*'].reject{ |it| File.directory?(it) } - ['./lux_assets.gemspec']
+  gem.files       = Dir['./bin/**/*'] + Dir['./lib/**/*'] + ['./.version']
 
   gem.executables = ['lux_assets']
 

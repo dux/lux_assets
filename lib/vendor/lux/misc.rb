@@ -14,26 +14,24 @@ Lux.app.before do
     end
   end
 
-  case nav.root
-  when 'compiled_asset'
-    path = nav.reset.drop(1).join('/')
+  _, root, asset_path = Lux.current.request.path.split('/', 3)
 
-    asset = LuxAssets::Element.new path
+  case root
+  when 'compiled_asset'
+    asset = LuxAssets::Element.new asset_path
     current.response.content_type asset.content_type
     current.response.body asset.compile
 
   when 'raw_asset'
-    path = nav.reset.drop(1).join('/')
-
     Lux.error "You can watch raw files only in development" unless Lux.dev?
 
-    file = Pathname.new path
+    file = Pathname.new asset_path
     body file.exist? ? file.read : "error: File not found"
   end
 end
 
 # additional info for "lux config" cli
-Lux::Config.info do
+Lux.app.info do
   puts
   puts 'assets:'
   for ext in LuxAssets.to_h.keys

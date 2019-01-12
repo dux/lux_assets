@@ -1,13 +1,15 @@
 # One file that can be scss, js, coffee, ts, etc...
 
+require 'erb'
+
 class LuxAssets::Element
 
   def initialize source
-    @source = Pathname.new source
+    @source = @cache_source = Pathname.new source
 
-    source  = source.sub(/^\.\//, '').sub(/^\//, '').gsub('/', '-')
-    source  = '%s-%s' % [@production ? :p : :d, source] if content_type == 'text/css'
-    @cache  = Pathname.new './tmp/assets/%s' % source
+    @target  = source.sub(/^\.\//, '').sub(/^\//, '').gsub('/', '-')
+    @target  = '%s-%s' % [@production ? :p : :d, @target] if content_type == 'text/css'
+    @cache  = Pathname.new './tmp/assets/%s' % @target
   end
 
   def content_type
@@ -21,7 +23,7 @@ class LuxAssets::Element
     method_name = 'compile_%s' % @source.to_s.split('.').last.downcase
 
     if respond_to?(method_name, true)
-      (!force && cached) || send(method_name)
+      (!force && cached) || ( process_erb; send(method_name))
     else
       @source.read
     end
@@ -32,7 +34,16 @@ class LuxAssets::Element
   private
 
   def cached
-    @cache.exist? && (@cache.ctime > @source.ctime) ? @cache.read : false
+    @cache.exist? && (@cache.ctime > @cache_source.ctime) ? @cache.read : false
+  end
+
+  def process_erb
+    data = @source.read
+    if data.include?('<%=') && data.include?('%>')
+      LuxAssets::Cli.info 'Compile ERB: %s' % @source
+      @source = Pathname.new './tmp/assets/erb-' + @target
+      @source.write ERB.new(data).result
+    end
   end
 
   def compile_coffee
