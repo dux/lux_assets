@@ -76,7 +76,7 @@ class LuxAssets::Element
   end
 
   def compile_ts
-    LuxAssets::Cli.run "node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'", cache_file: @cache, message: "Compile TypeScript: #{@source}"
+    LuxAssets::Cli.run "./node_modules/typescript/.bin/tsc --outFile '#{@cache}' '#{@source}'", cache_file: @cache, message: "Compile TypeScript: #{@source}"
   end
 
 end

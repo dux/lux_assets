@@ -221,3 +221,18 @@ end
 
 To test, `rake -T`
 
+## Documentation
+
+Rdoc from rubydoc.info - https://www.rubydoc.info/gems/lux_assets
+
+## Contact
+
+The best way to get in touch is to email reic.dino@gmail.com.
+
+## Security
+
+Assets are packed locally, no known security issues.
+
+## Licence
+
+MIT licence https://github.com/dux/lux_assets/blob/master/LICENSE
