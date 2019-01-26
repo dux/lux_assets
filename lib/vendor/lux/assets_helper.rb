@@ -64,7 +64,7 @@ module HtmlHelper
 
         nil
       else
-        opts[:integrity] = manifest['integrity'][file]
+        opts[:integrity] = manifest.dig('integrity', file)
         return asset_include(Lux.config.assets_root.to_s + mfile, opts)
       end
     end
