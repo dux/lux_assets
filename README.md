@@ -23,6 +23,7 @@ Assets pipeline
   * babel
 * minify
 * sha1 prefix, gzip, add to manifest
+* add integrity checks (sha512) to manifest
 
 
 ## Instalation
