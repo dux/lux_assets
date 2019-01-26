@@ -5,16 +5,25 @@ module HtmlHelper
   def asset_include path, opts={}
     raise ArgumentError.new("Asset path can't be empty") if path.empty?
 
-    ext  = path.split('?').first.split('.').last
-    type = ['css', 'sass', 'scss'].include?(ext) ? :style : :script
-    type = :style if path.include?('fonts.googleapis.com')
+    ext   = path.split('?').first.split('.').last
+    type  = ['css', 'sass', 'scss'].include?(ext) ? :style : :script
+    type  = :style if path.include?('fonts.googleapis.com')
 
     current.response.early_hints path, type
 
+    data = {}
+
+    data[:crossorigin] = opts[:crossorigin] || :anonymous
+    data[:integrity]   = opts[:integrity] if opts[:integrity]
+
     if type == :style
-      %[<link rel="stylesheet" href="#{path}" />]
+      data[:media] = opts[:media] || :all
+      data[:rel]   = :stylesheet
+      data[:href]  = path
+      data.tag :link
     else
-      %[<script src="#{path}"></script>]
+      data[:src] = path
+      data.tag :script
     end
   end
 
@@ -55,6 +64,7 @@ module HtmlHelper
 
         nil
       else
+        opts[:integrity] = manifest['integrity'][file]
         return asset_include(Lux.config.assets_root.to_s + mfile, opts)
       end
     end

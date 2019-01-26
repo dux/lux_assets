@@ -104,6 +104,9 @@ module LuxAssets
     # touch all files and reset the timestamp
     Dir['./public/assets/*']
       .each { |file| system 'touch -t 201001010101 %s' % file }
+
+    # add integirty checks
+    LuxAssets::Manifest.update_integrity
   end
 
   # get all files as a hash

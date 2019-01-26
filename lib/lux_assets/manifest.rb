@@ -1,25 +1,37 @@
 # manifest file
 
 module LuxAssets::Manifest
-  MANIFEST = Pathname.new(ENV.fetch('ASSETS_MANIFEST') { './public/manifest.json' })
-  MANIFEST.write '{"files":{}}' unless MANIFEST.exist?
+  INTEGRITY = 'sha512'
+  MANIFEST  = Pathname.new(ENV.fetch('ASSETS_MANIFEST') { './public/manifest.json' })
+  MANIFEST.write '{"files":{},"integrity":{}}' unless MANIFEST.exist?
 
   extend self
 
   def add name, path
-    json = JSON.load MANIFEST.read
-
     unless json['files'][name] == path
-      json['files'][name] = path
-      MANIFEST.write JSON.pretty_generate(json)
+      json['files'][name]     = path
+      write
     end
 
     !File.exist?('./public'+path)
   end
 
-  def get name
-    json = JSON.load MANIFEST.read
-    json['files'][name]
+  def update_integrity
+    for name, path in json['files']
+      json['integrity'][name] = '%s-%s' % [INTEGRITY, `openssl dgst -#{INTEGRITY} -binary ./public#{path} | openssl base64 -A`.chomp]
+    end
+
+    write
+  end
+
+  private
+
+  def json
+    @json ||= JSON.load MANIFEST.read
+  end
+
+  def write
+    MANIFEST.write JSON.pretty_generate(@json)
   end
 end
 

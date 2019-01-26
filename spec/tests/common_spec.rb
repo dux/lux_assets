@@ -42,5 +42,10 @@ describe LuxAssets do
       LuxAssets::Manifest::MANIFEST.delete
     end
   end
+
+  it 'expects openssl to be installed' do
+    check = `openssl dgst -sha512 -binary ./LICENSE | openssl base64 -A`.chomp
+    expect(check).to eq('N8B7a3flTwjxPfOcgyS0uLY9zYomxPv7PcimMZkKp73Q5RhlJ/yN5H/PBdtmmGu7qvcXLhqUDMZ6si5t38Qv7w==')
+  end
 end
 
