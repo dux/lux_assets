@@ -27,6 +27,11 @@ module LuxAssets
     class_eval &block
   end
 
+  def bulk name=nil, &block
+    add_files :js,  name, &block
+    add_files :css, name, &block
+  end
+
   def js name=nil, &block
     add_files :js, name, &block
   end
@@ -165,7 +170,8 @@ module LuxAssets
       @files = []
       @ext   = ext
       class_eval &block
-      @assets[ext][@name] = @files
+      @files.reject! { |it| it.include?('/!') }
+      @assets[ext][@name] = @files.reject { || }
     else
       Asset.new ext, name
     end
