@@ -19,17 +19,14 @@ module LuxAssets
   end
 
   def asset name
-    @name = name.to_s
+    @name    = name.to_s
+    @in_bulk = true
+    @bulk    = []
     yield
   end
 
   def configure &block
     class_eval &block
-  end
-
-  def bulk name=nil, &block
-    add_files :js,  name, &block
-    add_files :css, name, &block
   end
 
   def js name=nil, &block
@@ -46,6 +43,8 @@ module LuxAssets
   # add 'index.coffee'
   # add proc { ... }
   def add added
+    return @bulk.push added if @in_bulk
+
     case added
     when Array
       add_local_files added
@@ -167,9 +166,11 @@ module LuxAssets
 
   def add_files ext, name=nil, &block
     if block_given?
-      @files = []
-      @ext   = ext
+      @in_bulk = false
+      @files   = []
+      @ext     = ext
       class_eval &block
+      @bulk.map { |it| add it }
       @files.reject! { |it| it.include?('/!') }
       @assets[ext][@name] = @files.reject { || }
     else
