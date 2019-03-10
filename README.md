@@ -83,6 +83,8 @@ ap LuxAssets.to_h
 # relative_root './app/assets'
 
 asset :admin do
+  add 'package/trix_editor/*'  # add js anc css files in bulk
+
   js do
     add 'js/admin/js_vendor/*' # will add all files from a folder
     add 'js/shared/**'         # will add all files from a folder + subfolders
