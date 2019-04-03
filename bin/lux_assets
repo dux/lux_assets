@@ -54,15 +54,13 @@ class AssetsCli < Thor
 
   desc :install, 'Install all needed packages via yarn'
   def install
-    packages  = ["coffee-script", "node-sass", "typescript", "babel-cli", "autoprefixer-cli"]
+    packages  = ["coffeescript", "node-sass", "typescript", "babel-cli", "autoprefixer-cli"]
 
     if `which yarn`.empty?
       Cli.die('yarn not found -> install with "npm install yarn -g"')
     end
 
-    for pkg in packages
-      Cli.run 'yarn add %s' % pkg
-    end
+    Cli.run 'yarn add %s' % packages.join(' ')
 
     puts '* Installed: %s' % packages.map(&:green).join(', ')
 

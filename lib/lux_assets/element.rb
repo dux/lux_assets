@@ -47,7 +47,7 @@ class LuxAssets::Element
   end
 
   def compile_coffee
-    coffee_path = './node_modules/coffee-script/bin/coffee'
+    coffee_path = './node_modules/coffeescript/bin/coffee'
     coffee_opts = @production ? '-cp' : '-Mcp --no-header'
 
     if LuxAssets::Cli.run("#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'", cache_file: @cache, message: "Compile Coffee: #{@source}")

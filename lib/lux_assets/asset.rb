@@ -69,6 +69,9 @@ class LuxAssets::Asset
   end
 
   def save_data data
+    # BOM (Byte order mark) remove
+    data.gsub!("\xEF\xBB\xBF".force_encoding("UTF-8"), '')
+
     @asset_file = '/assets/%s' % (@target.sub('/', '-') + '-' + Digest::SHA1.hexdigest(data) + '.' + @ext.to_s)
     @asset_path = Pathname.new "./public#{@asset_file}"
 
