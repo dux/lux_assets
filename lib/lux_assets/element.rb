@@ -50,9 +50,12 @@ class LuxAssets::Element
     coffee_path = './node_modules/coffeescript/bin/coffee'
     coffee_opts = @production ? '-cp' : '-Mcp --no-header'
 
-    if LuxAssets::Cli.run("#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'", cache_file: @cache, message: "Compile Coffee: #{@source}")
+    cmd = "#{coffee_path} #{coffee_opts} '#{@source}' > '#{@cache}'"
+    # cmd = "#{coffee_path} #{coffee_opts} '#{@source}' | ./node_modules/.bin/babel --plugins babel-plugin-transform-react-jsx -o '#{@cache}'"
+
+    if LuxAssets::Cli.run(cmd, cache_file: @cache, message: "Compile Coffee: #{@source}")
       data = @cache.read
-      data = data.gsub(%r{//#\ssourceURL=[\w\-\.\/]+/app/assets/}, '//# sourceURL=/raw_asset/')
+      data = data.gsub(" sourceURL=#{Lux.root}/", " sourceURL=/raw_asset/")
 
       @cache.write data
 

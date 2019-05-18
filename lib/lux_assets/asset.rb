@@ -84,7 +84,7 @@ class LuxAssets::Asset
   def compile_js
     save_data @data.join(";\n") do
       # babel fix and minify
-      command = 'yarn run babel --minified --no-comments --compact true -o "%{file}" "%{file}"' % { file: @asset_path }
+      command = './node_modules/.bin/babel --plugins babel-plugin-transform-react-jsx --minified --no-comments --compact true -o "%{file}" "%{file}"' % { file: @asset_path }
       LuxAssets::Cli.run command, message: "Babel filter and minify: #{@asset_path}"
     end
   end

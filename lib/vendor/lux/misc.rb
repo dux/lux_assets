@@ -26,7 +26,7 @@ Lux.app.before do
     Lux.error "You can watch raw files only in development" unless Lux.dev?
 
     file = Pathname.new asset_path
-    body file.exist? ? file.read : "error: File not found"
+    current.response.body file.exist? ? file.read : "error: File not found"
   end
 end
 

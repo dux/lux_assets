@@ -23,6 +23,7 @@ module LuxAssets::Cli
     info (opts[:message] || what)
 
     stdin, stdout, stderr, wait_thread = Open3.popen3(what)
+    stdin.close
 
     error = stderr.gets
     while line = stderr.gets do

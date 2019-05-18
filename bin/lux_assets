@@ -52,15 +52,15 @@ end
 
 class AssetsCli < Thor
 
-  desc :install, 'Install all needed packages via yarn'
+  desc :install, 'Install all needed packages via npm'
   def install
-    packages  = ["coffeescript", "node-sass", "typescript", "babel-cli", "autoprefixer-cli"]
+    packages  = ["coffeescript", "node-sass", "typescript", "babel-cli", "babel-plugin-transform-react-jsx", "autoprefixer-cli"]
 
-    if `which yarn`.empty?
-      Cli.die('yarn not found -> install with "npm install yarn -g"')
+    if `which npm`.empty?
+      Cli.die('npm not found')
     end
 
-    Cli.run 'yarn add %s' % packages.join(' ')
+    Cli.run 'npm add %s' % packages.join(' ')
 
     puts '* Installed: %s' % packages.map(&:green).join(', ')
 
@@ -72,6 +72,15 @@ class AssetsCli < Thor
       end
 
       puts "* To include LuxAssets rake tasks in Rakefile, just require 'lux_assets'".green
+    end
+
+    # YARN complains for missing license, this will fix that
+    pfile = Pathname.new './package.json'
+    package = JSON.load pfile.read
+    if !package.key?('license') && !package.key?('private')
+      package['private'] = true
+      pfile.write package.to_json
+      puts '* Added "private": true to ./package.json'
     end
   end
 
